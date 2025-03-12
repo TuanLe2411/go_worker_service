@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"worker-service/internal/controller/app_controller"
 	"worker-service/pkg"
 	"worker-service/pkg/message_system/rabbitmq"
 )
@@ -23,6 +24,9 @@ func Run() {
 		panic(err)
 	}
 	log.Println("Connect to rabbitmq successfully")
+
+	// Register health check endpoint
+	http.HandleFunc("/health", app_controller.HealthHandler)
 
 	fmt.Println("Server is running on port: " + os.Getenv("SERVER_PORT"))
 	http.ListenAndServe(":"+os.Getenv("SERVER_PORT"), nil)
