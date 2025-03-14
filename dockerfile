@@ -15,12 +15,15 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o worker_service cmd/main/main.go
+RUN go build -ldflags="-s -w" -o worker_service cmd/main/main.go
 # Run stage
 FROM alpine:3.21
 
-# Add ca certificates and timezone data
-RUN apk --no-cache add ca-certificates tzdata
+# Add necessary packages
+RUN apk --no-cache add ca-certificates tzdata && \
+    mkdir /app
+
+ENV TZ=UTC
 
 WORKDIR /app
 
