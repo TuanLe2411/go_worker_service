@@ -1,11 +1,5 @@
 FROM golang:1.24.0-alpine AS builder
 
-# Set necessary environment variables for Go
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=arm64
-
 WORKDIR /app
 
 # Copy go mod and sum files first for better cache utilization
@@ -16,8 +10,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN go build -ldflags="-s -w" -o worker_service cmd/main/main.go
-
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o worker_service cmd/main/main.go
 # Run stage
 FROM alpine:3.21
 
