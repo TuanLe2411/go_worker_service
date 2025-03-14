@@ -1,5 +1,10 @@
 FROM golang:1.24.0-alpine AS builder
 
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=arm64
+
 WORKDIR /app
 
 # Copy go mod and sum files first for better cache utilization
