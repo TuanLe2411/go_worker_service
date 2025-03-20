@@ -1,12 +1,13 @@
 package rabbitmq
 
 import (
-	"log"
 	"os"
 	"strconv"
 	"sync"
 	"worker-service/pkg/handlers"
 	"worker-service/pkg/utils"
+
+	"github.com/rs/zerolog/log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -62,9 +63,9 @@ func (r *RabbitMQ) init() error {
 			workerPool.Start(handlers.HandleUserAction, numberOfRetry, string(msg.Body))
 			err := msg.Ack(false)
 			if err != nil {
-				log.Printf("Error acknowledging message: %s", err)
+				log.Error().Str("error", "Error acknowledging message: "+err.Error()).Msg("")
 			} else {
-				log.Printf("Acknowledged message")
+				log.Info().Msg("Acknowledged message")
 			}
 		}
 	}()

@@ -2,7 +2,9 @@ package utils
 
 import (
 	"crypto/rand"
-	"log"
+
+	"github.com/rs/zerolog/log"
+
 	"sync"
 	"worker-service/pkg/constant"
 )
@@ -15,7 +17,7 @@ type WorkerPool struct {
 
 func (p *WorkerPool) Start(handler constant.WorkerHandleFunc, numberOfRetry int, cmd any) *Worker {
 	if p.IsWorkerPoolFull() {
-		log.Println("Worker pool is full")
+		log.Error().Msg("Worker pool is full")
 		return nil
 	}
 	p.increaseWorking()

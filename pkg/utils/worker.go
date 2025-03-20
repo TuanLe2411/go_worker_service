@@ -2,8 +2,9 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"worker-service/pkg/constant"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Worker struct {
@@ -21,7 +22,7 @@ func (w *Worker) Execute(cmd any) {
 	if err == nil || w.numberOfRetry == 0 {
 		return
 	}
-	log.Println("Retry worker: " + w.name + " with error: " + err.Error() + " and retry time: " + fmt.Sprint(w.numberOfRetry))
+	log.Info().Msg("Retry worker: " + w.name + " with error: " + err.Error() + " and retry time: " + fmt.Sprint(w.numberOfRetry))
 	w.numberOfRetry--
 	w.Execute(cmd)
 }

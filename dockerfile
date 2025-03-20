@@ -2,8 +2,7 @@ FROM golang:1.24.0-alpine AS builder
 
 ENV GO111MODULE=on \
     CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=arm64
+    GOOS=linux
 
 WORKDIR /app
 
@@ -19,11 +18,14 @@ RUN go build -ldflags="-s -w" -o worker_service cmd/main/main.go
 # Run stage
 FROM alpine:3.21
 
-# Add necessary packages
-RUN apk --no-cache add ca-certificates tzdata && \
-    mkdir /app
+# Add necessary runtime packages and security configurations
+RUN apk add --no-cache ca-certificates tzdata curl && \
+    addgroup -S appgroup && adduser -S appuser -G appgroup && \
+    mkdir -p /app/log && chown appuser:appgroup /app/log && chmod 777 /app/log
 
-ENV TZ=UTC
+# Set the timezone to Asia/Ho_Chi_Minh
+ENV TZ=Asia/Ho_Chi_Minh
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /app
 
@@ -33,9 +35,6 @@ COPY --from=builder /app/worker_service .
 # Copy environment files
 COPY .env.* ./
 
-# Create a non-root user and set permissions
-RUN adduser -D -g '' appuser && \
-    chown -R appuser:appuser /app
 USER appuser
 
 # Expose the port
